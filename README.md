@@ -6,7 +6,7 @@
 
 Skill Icons Builder is a powerful tool that allows you to showcase your skills effortlessly on your GitHub profile or résumé. 
 <br><br>
-Built on top of [Skill Icons](https://github.com/tandpfun/skill-icons) by [tandpfun](https://github.com/tandpfun), this project simplifies the process of generating custom skill icons, offering various customization options to ensure the icons fit perfectly with your personal branding!
+Built on top of [Skill Icons](https://github.com/tandpfun/skill-icons) by [tandpfun](https://github.com/tandpfun), this project simplifies the process of showcasing your skills, offering various customization options to ensure the icons fit perfectly with your personal branding!
 
 ## Features
 
