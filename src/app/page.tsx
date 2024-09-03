@@ -1,5 +1,4 @@
 "use client";
-
 import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Clipboard, Check } from "lucide-react";
@@ -39,9 +38,10 @@ const availableIcons = [
   "wordpress", "workers", "xd", "yarn", "yew", "zig"
 ];
 
+
 export default function IconBuilder() {
-  const { theme } = useTheme();
-  const selectedTheme = theme === "dark" ? "light" : "dark";
+  const { theme, resolvedTheme } = useTheme();
+  const selectedTheme = (resolvedTheme || theme) === "dark" ? "light" : "dark"; 
   const [search, setSearch] = useState("");
   const [selectedIcons, setSelectedIcons] = useState<string[]>([]);
   const [filteredIcons, setFilteredIcons] = useState(availableIcons);
@@ -56,6 +56,10 @@ export default function IconBuilder() {
       )
     );
   }, [search]);
+
+  useEffect(() => {
+    setIsDarkTheme(resolvedTheme === "dark");
+  }, [resolvedTheme]);
 
   const toggleIcon = (icon: string) => {
     setSelectedIcons((prev) =>
@@ -92,7 +96,7 @@ export default function IconBuilder() {
     const textToCopy = format === 'markdown' ? generateMarkdown() : generateHtmlCentered();
     navigator.clipboard.writeText(textToCopy).then(() => {
       setIsCopied(true);
-      setTimeout(() => setIsCopied(false), 1000); // Reset the icon after 1 second
+      setTimeout(() => setIsCopied(false), 1000);
     });
   };
 
