@@ -1,13 +1,17 @@
-'use client'
+"use client";
 
-import { useState, useEffect } from 'react'
-import { Input } from "@/components/ui/input"
-// Remove the unused import statement for Button
-import { Card } from "@/components/ui/card"
-import { Switch } from "@/components/ui/switch"
-import { Slider } from "@/components/ui/slider"
+import { useState, useEffect } from "react";
+import { Input } from "@/components/ui/input";
+import { Clipboard, Check } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Switch } from "@/components/ui/switch";
+import { Slider } from "@/components/ui/slider";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useTheme } from "next-themes";
+import { ModeToggle } from "@/components/mode-toggle";
 
-// List of available icons (you would need to fetch this from Skill Icons or maintain your own list)
+
 const availableIcons = [
   "ableton", "activitypub", "actix", "adonis", "ae", "aiscript", "alpinejs", "anaconda", "androidstudio", "angular",
   "ansible", "apollo", "apple", "appwrite", "arch", "arduino", "astro", "atom", "au", "autocad",
@@ -35,129 +39,180 @@ const availableIcons = [
   "wordpress", "workers", "xd", "yarn", "yew", "zig"
 ];
 
-
-
 export default function IconBuilder() {
-  const [search, setSearch] = useState('')
-  const [selectedIcons, setSelectedIcons] = useState<string[]>([])
-  const [filteredIcons, setFilteredIcons] = useState(availableIcons)
-  const [isDarkTheme, setIsDarkTheme] = useState(true)
-  const [isCentered, setIsCentered] = useState(false)
-  const [iconsPerLine, setIconsPerLine] = useState(15)
+  const { theme } = useTheme();
+  const selectedTheme = theme === "dark" ? "light" : "dark";
+  const [search, setSearch] = useState("");
+  const [selectedIcons, setSelectedIcons] = useState<string[]>([]);
+  const [filteredIcons, setFilteredIcons] = useState(availableIcons);
+  const [isDarkTheme, setIsDarkTheme] = useState(true);
+  const [isCentered, setIsCentered] = useState(false);
+  const [iconsPerLine, setIconsPerLine] = useState(10);
 
   useEffect(() => {
     setFilteredIcons(
-      availableIcons.filter(icon => 
+      availableIcons.filter((icon) =>
         icon.toLowerCase().includes(search.toLowerCase())
       )
-    )
-  }, [search])
+    );
+  }, [search]);
 
   const toggleIcon = (icon: string) => {
-    setSelectedIcons(prev => 
-      prev.includes(icon) 
-        ? prev.filter(i => i !== icon) 
-        : [...prev, icon]
-    )
-  }
+    setSelectedIcons((prev) =>
+      prev.includes(icon) ? prev.filter((i) => i !== icon) : [...prev, icon]
+    );
+  };
 
   const generateUrl = () => {
-    const baseUrl = 'https://skillicons.dev/icons'
-    const iconParams = selectedIcons.join(',')
-    const themeParam = isDarkTheme ? '' : '&theme=light'
-    const centerParam = isCentered ? '&center=true' : ''
-    const perlineParam = iconsPerLine !== 15 ? `&perline=${iconsPerLine}` : ''
-    return `${baseUrl}?i=${iconParams}${themeParam}${centerParam}${perlineParam}`
-  }
+    const baseUrl = "https://skillicons.dev/icons";
+    const iconParams = selectedIcons.join(",");
+    const themeParam = isDarkTheme ? "" : "&theme=light";
+    const centerParam = isCentered ? "&center=true" : "";
+    const perlineParam = iconsPerLine !== 15 ? `&perline=${iconsPerLine}` : "";
+    return `${baseUrl}?i=${iconParams}${themeParam}${centerParam}${perlineParam}`;
+  };
 
   const generateMarkdown = () => {
-    const url = generateUrl()
-    return `[![My Skills](${url})](https://skillicons.dev)\n\nMy Skills`
-  }
+    const url = generateUrl();
+    return `[![My Skills](${url})](https://skillicons.dev)\n\nMy Skills`;
+  };
 
   const generateHtmlCentered = () => {
-    const url = generateUrl()
+    const url = generateUrl();
     return `<p align="center">
-  <a href="https://skillicons.dev">
-    <img src="${url}" />
-  </a>
-</p>`
-  }
+    <a href="https://skillicons.dev">
+      <img src="${url}" />
+    </a>
+  </p>`;
+  };
+
+  const [isCopied, setIsCopied] = useState(false);
+
+  const handleCopy = (format: 'markdown' | 'html') => {
+    const textToCopy = format === 'markdown' ? generateMarkdown() : generateHtmlCentered();
+    navigator.clipboard.writeText(textToCopy).then(() => {
+      setIsCopied(true);
+      setTimeout(() => setIsCopied(false), 1000); // Reset the icon after 1 second
+    });
+  };
 
   return (
-    <div className="container mx-auto p-4 max-w-4xl">
-      <h1 className="text-3xl font-bold mb-6 text-center">Skill Icon Builder</h1>
-      <div className="flex gap-4 mb-6">
-        <Input
-          type="text"
-          placeholder="Search icons..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="flex-grow"
-        />
-      </div>
-      <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-4 mb-6">
-        {filteredIcons.map((icon) => (
-          <Card
-            key={icon}
-            className={`p-4 cursor-pointer transition-colors ${
-              selectedIcons.includes(icon) ? 'bg-primary text-primary-foreground' : ''
-            }`}
-            onClick={() => toggleIcon(icon)}
-          >
-            <img 
-              src={`https://skillicons.dev/icons?i=${icon}`} 
-              alt={icon} 
-              className="w-12 h-12 mx-auto mb-2"
+    <div className="container mx-auto p-4 max-w-7xl mt-10">
+      <div className="flex flex-col lg:flex-row gap-6">
+      <div className="w-full lg:w-1/3 lg:sticky lg:top-4 lg:self-start">
+        <h1 className="text-3xl font-bold mb-6 text-center" id="title">
+          Skill Icon Builder
+        </h1>
+        <div className="mb-6 flex gap-2">
+            <Input
+              type="text"
+              placeholder="Search icons..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full"
             />
-            <p className="text-center text-sm">{icon}</p>
+            <ModeToggle></ModeToggle>
+          </div>
+          <Card className="p-4">
+            <h2 className="text-xl font-semibold mb-4">Preview</h2>
+            <div
+              className={`flex flex-wrap gap-2 ${
+                isCentered ? "justify-center" : ""
+              }`}
+            >
+              <img
+                src={generateUrl()}
+                alt="Selected Skills"
+                className="max-w-full"
+              />
+            </div>
           </Card>
-        ))}
-      </div>
-      <div className="flex flex-wrap items-center gap-4 mb-6">
-        <div className="flex items-center gap-2">
-          <Switch
-            checked={isDarkTheme}
-            onCheckedChange={setIsDarkTheme}
-            id="theme-toggle"
-          />
-          <label htmlFor="theme-toggle">Dark Theme</label>
+          <div className="flex flex-wrap items-center gap-4 mb-6 mt-10">
+            <div className="flex items-center gap-2">
+              <Switch
+                checked={isDarkTheme}
+                onCheckedChange={setIsDarkTheme}
+                id="theme-toggle"
+              />
+              <label htmlFor="theme-toggle">Dark Theme</label>
+            </div>
+            <div className="flex items-center gap-2">
+              <Switch
+                checked={isCentered}
+                onCheckedChange={setIsCentered}
+                id="center-toggle"
+              />
+              <label htmlFor="center-toggle">Center Icons</label>
+            </div>
+            <div className="flex items-center gap-2 flex-grow">
+              <label htmlFor="icons-per-line">
+                Icons per line: {iconsPerLine}
+              </label>
+              <Slider
+                id="icons-per-line"
+                min={1}
+                max={50}
+                step={1}
+                value={[iconsPerLine]}
+                onValueChange={([value]) => setIconsPerLine(value)}
+                className="w-[113px] max-w-xs"
+              />
+            </div>
+          </div>
+          <Tabs defaultValue="markdown" className="w-full">
+            <TabsList>
+              <TabsTrigger value="markdown">Markdown</TabsTrigger>
+              <TabsTrigger value="html">HTML (Centered)</TabsTrigger>
+            </TabsList>
+            <TabsContent value="markdown">
+              <div className="flex items-center gap-2">
+                <Input value={generateMarkdown()} readOnly />
+                <Button variant="outline" size="icon" onClick={() => handleCopy('markdown')}>
+                  {isCopied ? (
+                    <Check className="h-4 w-4" />
+                  ) : (
+                    <Clipboard className="h-4 w-4" />
+                  )}
+                </Button>
+              </div>
+            </TabsContent>
+            <TabsContent value="html">
+              <div className="flex items-center gap-2">
+                <Input value={generateHtmlCentered()} readOnly />
+                <Button variant="outline" size="icon" onClick={() => handleCopy('html')}>
+                  {isCopied ? (
+                    <Check className="h-4 w-4" />
+                  ) : (
+                    <Clipboard className="h-4 w-4" />
+                  )}
+                </Button>
+              </div>
+            </TabsContent>
+          </Tabs>
         </div>
-        <div className="flex items-center gap-2">
-          <Switch
-            checked={isCentered}
-            onCheckedChange={setIsCentered}
-            id="center-toggle"
-          />
-          <label htmlFor="center-toggle">Center Icons</label>
+        <div className="w-full lg:w-2/3">
+          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-4 mb-6">
+            {filteredIcons.map((icon) => (
+              <Card
+                key={icon}
+                className={`p-4 cursor-pointer transition-colors ${
+                  selectedIcons.includes(icon)
+                    ? "bg-primary text-primary-foreground"
+                    : ""
+                }`}
+                onClick={() => toggleIcon(icon)}
+              >
+                <img
+                  src={`https://skillicons.dev/icons?i=${icon}&theme=${selectedTheme}`}
+                  alt={icon}
+                  className="w-12 h-12 mx-auto mb-2"
+                />
+                <p className="text-center text-sm">{icon}</p>
+              </Card>
+            ))}
+          </div>
         </div>
-        <div className="flex items-center gap-2 flex-grow">
-          <label htmlFor="icons-per-line">Icons per line: {iconsPerLine}</label>
-          <Slider
-            id="icons-per-line"
-            min={1}
-            max={50}
-            step={1}
-            value={[iconsPerLine]}
-            onValueChange={([value]) => setIconsPerLine(value)}
-            className="w-full max-w-xs"
-          />
-        </div>
-      </div>
-      <div className="mb-6">
-        <h2 className="text-xl font-semibold mb-2">Preview</h2>
-        <div className={`flex flex-wrap gap-2 ${isCentered ? 'justify-center' : ''}`}>
-          <img src={generateUrl()} alt="Selected Skills" className="max-w-full" />
-        </div>
-      </div>
-      <div className="mb-6">
-        <h2 className="text-xl font-semibold mb-2">Markdown Code</h2>
-        <Input value={generateMarkdown()} readOnly />
-      </div>
-      <div className="mb-6">
-        <h2 className="text-xl font-semibold mb-2">HTML Code (Centered)</h2>
-        <Input value={generateHtmlCentered()} readOnly />
       </div>
     </div>
-  )
+  );
 }
