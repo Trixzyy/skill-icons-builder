@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
-import { Clipboard, Check } from "lucide-react";
+import { Clipboard, Check, ClipboardX } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
@@ -41,7 +41,7 @@ const availableIcons = [
 
 export default function IconBuilder() {
   const { theme, resolvedTheme } = useTheme();
-  const selectedTheme = (resolvedTheme || theme) === "dark" ? "light" : "dark"; 
+  const selectedTheme = (resolvedTheme || theme) === "dark" ? "light" : "dark";
   const [search, setSearch] = useState("");
   const [selectedIcons, setSelectedIcons] = useState<string[]>([]);
   const [filteredIcons, setFilteredIcons] = useState(availableIcons);
@@ -67,22 +67,34 @@ export default function IconBuilder() {
     );
   };
 
-  const generateUrl = () => {
+  const generateUrl = (): string | false => {
     const baseUrl = "https://skillicons.dev/icons";
     const iconParams = selectedIcons.join(",");
     const themeParam = isDarkTheme ? "" : "&theme=light";
     const centerParam = isCentered ? "&center=true" : "";
     const perlineParam = iconsPerLine !== 15 ? `&perline=${iconsPerLine}` : "";
-    return `${baseUrl}?i=${iconParams}${themeParam}${centerParam}${perlineParam}`;
+
+    if (iconParams.length === 0) {
+      return false;
+    } else {
+      return `${baseUrl}?i=${iconParams}${themeParam}${centerParam}${perlineParam}`;
+    }
   };
+
 
   const generateMarkdown = () => {
     const url = generateUrl();
+    if (!url) {
+      return "No icons selected";
+    }
     return `[![My Skills](${url})](https://skillicons.dev)\n\nMy Skills`;
   };
 
   const generateHtmlCentered = () => {
     const url = generateUrl();
+    if (!url) {
+      return "No icons selected";
+    }
     return `<p align="center">
     <a href="https://skillicons.dev">
       <img src="${url}" />
@@ -103,11 +115,11 @@ export default function IconBuilder() {
   return (
     <div className="container mx-auto p-4 max-w-7xl mt-10">
       <div className="flex flex-col lg:flex-row gap-6">
-      <div className="w-full lg:w-1/3 lg:sticky lg:top-4 lg:self-start">
-        <h1 className="text-3xl font-bold mb-6 text-center" id="title">
-          Skill Icon Builder
-        </h1>
-        <div className="mb-6 flex gap-2">
+        <div className="w-full lg:w-1/3 lg:sticky lg:top-4 lg:self-start">
+          <h1 className="text-3xl font-bold mb-6 text-center" id="title">
+            Skill Icon Builder
+          </h1>
+          <div className="mb-6 flex gap-2">
             <Input
               type="text"
               placeholder="Search icons..."
@@ -120,15 +132,20 @@ export default function IconBuilder() {
           <Card className="p-4">
             <h2 className="text-xl font-semibold mb-4">Preview</h2>
             <div
-              className={`flex flex-wrap gap-2 ${
-                isCentered ? "justify-center" : ""
-              }`}
+              className={`flex flex-wrap gap-2 min-h-[48px] 
+                ${isCentered && (generateUrl()) ? ("justify-center") : "justify-start"
+                }
+                ${!generateUrl() ? (
+                  "gray-500 dark:text-gray-400 text-sm justify-start") : ""
+                }
+                
+                `}
             >
-              <img
-                src={generateUrl()}
-                alt="Selected Skills"
-                className="max-w-full"
-              />
+              {generateUrl() ? (
+                <img src={generateUrl() as string} alt="Selected Skills" className="max-w-full" />
+              ) : "Select some icons to generate a preview"}
+
+
             </div>
           </Card>
           <div className="flex flex-wrap items-center gap-4 mb-6 mt-10">
@@ -169,25 +186,37 @@ export default function IconBuilder() {
               <TabsTrigger value="html">HTML (Centered)</TabsTrigger>
             </TabsList>
             <TabsContent value="markdown">
-              <div className="flex items-center gap-2">
-                <Input value={generateMarkdown()} readOnly />
-                <Button variant="outline" size="icon" onClick={() => handleCopy('markdown')}>
+              <div className={`flex items-center gap-2 ${!generateUrl() ? ("cursor-not-allowed") : ("")}`}>
+                <Input value={generateMarkdown()} readOnly className={`${!generateUrl() ? (
+                  "gray-500 dark:text-gray-400 text-sm"
+                ) : ""}`} />
+                <Button variant="outline" disabled={!generateUrl()} size="icon" onClick={() => handleCopy('markdown')}>
                   {isCopied ? (
                     <Check className="h-4 w-4" />
                   ) : (
+                    ""
+                  )}
+                  {generateUrl() ? (
                     <Clipboard className="h-4 w-4" />
+                  ) : (
+                    <ClipboardX className="h-4 w-4" />
                   )}
                 </Button>
               </div>
             </TabsContent>
             <TabsContent value="html">
-              <div className="flex items-center gap-2">
+              <div className={`flex items-center gap-2 ${!generateUrl() ? ("cursor-not-allowed") : ("")}`}>
                 <Input value={generateHtmlCentered()} readOnly />
-                <Button variant="outline" size="icon" onClick={() => handleCopy('html')}>
+                <Button variant="outline" disabled={!generateUrl()} size="icon" onClick={() => handleCopy('html')}>
                   {isCopied ? (
                     <Check className="h-4 w-4" />
                   ) : (
+                    ""
+                  )}
+                  {generateUrl() ? (
                     <Clipboard className="h-4 w-4" />
+                  ) : (
+                    <ClipboardX className="h-4 w-4" />
                   )}
                 </Button>
               </div>
@@ -199,11 +228,10 @@ export default function IconBuilder() {
             {filteredIcons.map((icon) => (
               <Card
                 key={icon}
-                className={`p-4 cursor-pointer transition-colors ${
-                  selectedIcons.includes(icon)
-                    ? "bg-primary text-primary-foreground"
-                    : ""
-                }`}
+                className={`p-4 cursor-pointer transition-colors ${selectedIcons.includes(icon)
+                  ? "bg-primary text-primary-foreground"
+                  : ""
+                  }`}
                 onClick={() => toggleIcon(icon)}
               >
                 <img
