@@ -67,15 +67,15 @@ export default function IconBuilder() {
     );
   };
 
-  const generateUrl = (): string | false => {
+  const generateUrl = (): string => {
     const baseUrl = "https://skillicons.dev/icons";
     const iconParams = selectedIcons.join(",");
     const themeParam = isDarkTheme ? "" : "&theme=light";
     const centerParam = isCentered ? "&center=true" : "";
     const perlineParam = iconsPerLine !== 15 ? `&perline=${iconsPerLine}` : "";
-
+  
     if (iconParams.length === 0) {
-      return false;
+      return "";
     } else {
       return `${baseUrl}?i=${iconParams}${themeParam}${centerParam}${perlineParam}`;
     }
@@ -87,7 +87,7 @@ export default function IconBuilder() {
     if (!url) {
       return "No icons selected";
     }
-    return `[![My Skills](${url})](https://skillicons.dev)\n\nMy Skills`;
+    return `[![My Skills](${url})](https://skill-icons-builder.vercel.app/)\n\nMy Skills`;
   };
 
   const generateHtmlCentered = () => {
@@ -96,7 +96,7 @@ export default function IconBuilder() {
       return "No icons selected";
     }
     return `<p align="center">
-    <a href="https://skillicons.dev">
+    <a href="https://skill-icons-builder.vercel.app/">
       <img src="${url}" />
     </a>
   </p>`;
@@ -104,8 +104,8 @@ export default function IconBuilder() {
 
   const [isCopied, setIsCopied] = useState(false);
 
-  const handleCopy = (format: 'markdown' | 'html') => {
-    const textToCopy = format === 'markdown' ? generateMarkdown() : generateHtmlCentered();
+  const handleCopy = (format: 'markdown' | 'html' | 'url') => {
+    const textToCopy = format === 'markdown' ? generateMarkdown() : format === 'html' ? generateHtmlCentered() : generateUrl() || '';
     navigator.clipboard.writeText(textToCopy).then(() => {
       setIsCopied(true);
       setTimeout(() => setIsCopied(false), 1000);
@@ -184,6 +184,7 @@ export default function IconBuilder() {
             <TabsList>
               <TabsTrigger value="markdown">Markdown</TabsTrigger>
               <TabsTrigger value="html">HTML (Centered)</TabsTrigger>
+              <TabsTrigger value="url">URL</TabsTrigger>
             </TabsList>
             <TabsContent value="markdown">
               <div className={`flex items-center gap-2 ${!generateUrl() ? ("cursor-not-allowed") : ("")}`}>
@@ -191,12 +192,9 @@ export default function IconBuilder() {
                   "gray-500 dark:text-gray-400 text-sm"
                 ) : ""}`} />
                 <Button variant="outline" disabled={!generateUrl()} size="icon" onClick={() => handleCopy('markdown')}>
-                  {isCopied ? (
+                {isCopied ? (
                     <Check className="h-4 w-4" />
-                  ) : (
-                    ""
-                  )}
-                  {generateUrl() ? (
+                  ) : generateUrl() ? (
                     <Clipboard className="h-4 w-4" />
                   ) : (
                     <ClipboardX className="h-4 w-4" />
@@ -208,12 +206,25 @@ export default function IconBuilder() {
               <div className={`flex items-center gap-2 ${!generateUrl() ? ("cursor-not-allowed") : ("")}`}>
                 <Input value={generateHtmlCentered()} readOnly />
                 <Button variant="outline" disabled={!generateUrl()} size="icon" onClick={() => handleCopy('html')}>
-                  {isCopied ? (
+                {isCopied ? (
                     <Check className="h-4 w-4" />
+                  ) : generateUrl() ? (
+                    <Clipboard className="h-4 w-4" />
                   ) : (
-                    ""
+                    <ClipboardX className="h-4 w-4" />
                   )}
-                  {generateUrl() ? (
+                </Button>
+              </div>
+            </TabsContent>
+            <TabsContent value="url">
+              <div className={`flex items-center gap-2 ${!generateUrl() ? ("cursor-not-allowed") : ("")}`}>
+                <Input value={generateUrl()} readOnly className={`${!generateUrl() ? (
+                  "gray-500 dark:text-gray-400 text-sm"
+                ) : ""}`} />
+                <Button variant="outline" disabled={!generateUrl()} size="icon" onClick={() => handleCopy('url')}>
+                {isCopied ? (
+                    <Check className="h-4 w-4" />
+                  ) : generateUrl() ? (
                     <Clipboard className="h-4 w-4" />
                   ) : (
                     <ClipboardX className="h-4 w-4" />
