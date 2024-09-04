@@ -67,19 +67,20 @@ export default function IconBuilder() {
     );
   };
 
-  const generateUrl = () => {
+  const generateUrl = (): string | false => {
     const baseUrl = "https://skillicons.dev/icons";
     const iconParams = selectedIcons.join(",");
     const themeParam = isDarkTheme ? "" : "&theme=light";
     const centerParam = isCentered ? "&center=true" : "";
     const perlineParam = iconsPerLine !== 15 ? `&perline=${iconsPerLine}` : "";
+
     if (iconParams.length === 0) {
       return false;
-    }
-    else {
+    } else {
       return `${baseUrl}?i=${iconParams}${themeParam}${centerParam}${perlineParam}`;
     }
   };
+
 
   const generateMarkdown = () => {
     const url = generateUrl();
@@ -141,7 +142,7 @@ export default function IconBuilder() {
                 `}
             >
               {generateUrl() ? (
-                <img src={generateUrl()} alt="Selected Skills" className="max-w-full" />
+                <img src={generateUrl() as string} alt="Selected Skills" className="max-w-full" />
               ) : "Select some icons to generate a preview"}
 
 
