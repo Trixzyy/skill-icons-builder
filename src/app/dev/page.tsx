@@ -21,13 +21,14 @@ export default function IconBuilder() {
   const [selectedIcons, setSelectedIcons] = useState<IconItem[]>([]);
   const [filteredIcons, setFilteredIcons] = useState<IconItem[]>(availableIcons);
   const [isDarkTheme, setIsDarkTheme] = useState(true);
+  const [isPrevDarkTheme, setIsPrevDarkTheme] = useState(true);
   const [isCentered, setIsCentered] = useState(false);
   const [iconsPerLine, setIconsPerLine] = useState(10);
   const [isCopied, setIsCopied] = useState(false);
 
   useEffect(() => {
     setFilteredIcons(
-      availableIcons.filter((icon) => 
+      availableIcons.filter((icon) =>
         icon.name.toLowerCase().includes(search.toLowerCase()) ||
         icon.id.toLowerCase().includes(search.toLowerCase())
       )
@@ -94,12 +95,12 @@ export default function IconBuilder() {
       <div className="flex flex-col lg:flex-row gap-6">
         <div className="w-full lg:w-1/3 lg:sticky lg:top-10 lg:self-start">
           <div className="mb-6 text-center" id="title">
-          <Image
-            src={`./Skill-Icons-Builder-Logo-${isDarkTheme ? 'light' : 'dark'}.svg`}
-            alt="Skill Icons Builder Logo"
-            width={500}
-            height={300}
-          />
+            <Image
+              src={`./Skill-Icons-Builder-Logo-${isDarkTheme ? 'light' : 'dark'}.svg`}
+              alt="Skill Icons Builder Logo"
+              width={500}
+              height={300}
+            />
           </div>
           <div className="mb-6 flex gap-2">
             <Input
@@ -113,35 +114,45 @@ export default function IconBuilder() {
           </div>
           <Card className="p-4">
             <h2 className="text-xl font-semibold mb-4">Preview</h2>
-            <ReactSortable
-              list={selectedIcons}
-              setList={setSelectedIcons}
-              animation={200}
-              delay={2}
-              className={`flex flex-wrap gap-2 min-h-[48px] ${isCentered && generateUrl() !== "No icons selected" ? "justify-center" : "justify-start"}`}
-            >
-              {selectedIcons.length > 0 ? (
-                selectedIcons.map((icon) => (
-                  <div key={icon.id} className="cursor-move">
-                    <img
-                      src={`https://skillicons.dev/icons?i=${icon.id}&theme=${isDarkTheme ? 'dark' : 'light'}`}
-                      alt={icon.name}
-                      className="w-12 h-12"
-                    />
-                  </div>
-                ))
-              ) : (
-                <span className="text-gray-500 dark:text-gray-400 text-sm">
-                  Select some icons to generate a preview
-                </span>
-              )}
-            </ReactSortable>
+            <div className={`w-full flex ${isCentered && selectedIcons.length > 0 ? "justify-center" : "justify-start"}`}>
+              <ReactSortable
+                list={selectedIcons}
+                setList={setSelectedIcons}
+                animation={200}
+                delay={2}
+                className={`grid gap-2  w-fit`}
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: `repeat(${Math.min(selectedIcons.length, iconsPerLine)}, minmax(0,1fr)) `,
+                  justifyContent: isCentered ? "center" : "start",
+                  alignItems: 'center',
+                  placeItems: isCentered ? 'center' : 'start',
+                }}
+              >
+                {selectedIcons.length > 0 ? (
+                  selectedIcons.map((icon) => (
+                    <div key={icon.id} className="cursor-move h-fit w-fit">
+                      <img
+                        src={`https://skillicons.dev/icons?i=${icon.id}&theme=${isPrevDarkTheme ? 'dark' : 'light'}`}
+                        alt={icon.name}
+                      />
+                    </div>
+                  ))
+                ) : (
+                  <span className="text-gray-500 dark:text-gray-400 text-sm">
+                    Select some icons to generate a preview
+                  </span>
+                )}
+              </ReactSortable>
+            </div>
+
+
           </Card>
           <div className="flex flex-wrap items-center gap-4 mb-6 mt-10">
             <div className="flex items-center gap-2">
               <Switch
-                checked={isDarkTheme}
-                onCheckedChange={setIsDarkTheme}
+                checked={isPrevDarkTheme}
+                onCheckedChange={setIsPrevDarkTheme}
                 id="theme-toggle"
               />
               <label htmlFor="theme-toggle">Dark Theme</label>
@@ -161,7 +172,7 @@ export default function IconBuilder() {
               <Slider
                 id="icons-per-line"
                 min={1}
-                max={50}
+                max={20}
                 step={1}
                 value={[iconsPerLine]}
                 onValueChange={([value]) => setIconsPerLine(value)}
@@ -224,9 +235,8 @@ export default function IconBuilder() {
             {filteredIcons.map((icon) => (
               <Card
                 key={icon.id}
-                className={`p-4 cursor-pointer transition-colors ${
-                  selectedIcons.some(i => i.id === icon.id) ? "bg-primary text-primary-foreground" : ""
-                }`}
+                className={`p-4 cursor-pointer transition-colors ${selectedIcons.some(i => i.id === icon.id) ? "bg-primary text-primary-foreground" : ""
+                  }`}
                 onClick={() => toggleIcon(icon)}
               >
                 <img
