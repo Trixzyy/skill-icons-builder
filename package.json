@@ -1,6 +1,6 @@
 {
   "name": "skill-icons-builder",
-  "version": "0.2.2",
+  "version": "0.2.4",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -22,6 +22,7 @@
     "next-themes": "^0.3.0",
     "react": "^18",
     "react-dom": "^18",
+    "react-sortablejs": "^6.1.4",
     "tailwind-merge": "^2.5.2",
     "tailwindcss-animate": "^1.0.7"
   },
