@@ -1,5 +1,5 @@
-<p align="center"><img align="center" width="280" src="https://github.com/tandpfun/skill-icons/blob/main/.github/text-logo.svg#gh-dark-mode-only"/></p>
-<p align="center"><img align="center" width="280" src="https://github.com/tandpfun/skill-icons/blob/main/.github/text-logo.svg#gh-light-mode-only"/></p>
+<p align="center"><img align="center" width="450" src="https://raw.githubusercontent.com/Trixzyy/skill-icons-builder/main/public/Skill-Icons-Builder-Logo-light.svg#gh-dark-mode-only"/></p>
+<p align="center"><img align="center" width="450" src="https://raw.githubusercontent.com/Trixzyy/skill-icons-builder/main/public/Skill-Icons-Builder-Logo-dark.svg#gh-light-mode-only"/></p>
 <h3 align="center">Showcase your skills on your GitHub or resumé with ease!</h3>
 <h3 align="center">https://skill-icons-builder.vercel.app/</h3>
 
