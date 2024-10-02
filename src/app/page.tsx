@@ -1,4 +1,5 @@
 "use client";
+
 import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Clipboard, Check, ClipboardX } from "lucide-react";
@@ -10,35 +11,37 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useTheme } from "next-themes";
 import { ModeToggle } from "@/components/mode-toggle";
 import { ReactSortable } from "react-sortablejs";
-import { availableIcons, IconItem } from "../lib/icons"// Import from the new file
+import { availableIcons, IconItem } from "../lib/icons"
 import Image from "next/image";
-
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export default function IconBuilder() {
-  //Handle site theme
   const { theme, resolvedTheme } = useTheme();
   const selectedTheme = (resolvedTheme || theme) === "dark" ? "light" : "dark";
   const [isDarkTheme, setIsDarkTheme] = useState(true);
 
-  //Icon Searching and Selecting
   const [search, setSearch] = useState("");
   const [selectedIcons, setSelectedIcons] = useState<IconItem[]>([]);
   const [filteredIcons, setFilteredIcons] = useState<IconItem[]>(availableIcons);
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
   
-  // Icon Preview Options
   const [iconTheme, setIconTheme] = useState(true);
   const [isCentered, setIsCentered] = useState(false);
   const [iconsPerLine, setIconsPerLine] = useState(10);
   const [isCopied, setIsCopied] = useState(false);
 
+  // Extract unique categories from availableIcons
+  const categories = ["all", ...new Set(availableIcons.flatMap(icon => icon.category || []))].sort();
+  
   useEffect(() => {
     setFilteredIcons(
       availableIcons.filter((icon) =>
-        icon.name.toLowerCase().includes(search.toLowerCase()) ||
-        icon.id.toLowerCase().includes(search.toLowerCase())
+        (icon.name.toLowerCase().includes(search.toLowerCase()) ||
+        icon.id.toLowerCase().includes(search.toLowerCase())) &&
+        (selectedCategory === "all" || (icon.category && icon.category.includes(selectedCategory)))
       )
     );
-  }, [search]);
+  }, [search, selectedCategory]);
 
   useEffect(() => {
     setIsDarkTheme(resolvedTheme === "dark");
@@ -115,7 +118,7 @@ export default function IconBuilder() {
               onChange={(e) => setSearch(e.target.value)}
               className="w-full"
             />
-            <ModeToggle></ModeToggle>
+            <ModeToggle />
           </div>
           <Card className="p-4">
             <h2 className="text-xl font-semibold mb-4">Preview</h2>
@@ -150,8 +153,6 @@ export default function IconBuilder() {
                 )}
               </ReactSortable>
             </div>
-
-
           </Card>
           <div className="flex flex-wrap items-center gap-4 mb-6 mt-10">
             <div className="flex items-center gap-2">
@@ -236,12 +237,27 @@ export default function IconBuilder() {
           </Tabs>
         </div>
         <div className="w-full lg:w-2/3">
+          <div className="mb-4">
+            <Select onValueChange={(value) => setSelectedCategory(value)} defaultValue="all">
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Select a category" />
+              </SelectTrigger>
+              <SelectContent>
+                {categories.map((category) => (
+                  <SelectItem key={category} value={category}>
+                    {category.charAt(0).toUpperCase() + category.slice(1)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
           <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-4 mb-6">
             {filteredIcons.map((icon) => (
               <Card
                 key={icon.id}
-                className={`p-4 cursor-pointer transition-colors ${selectedIcons.some(i => i.id === icon.id) ? "bg-primary text-primary-foreground" : ""
-                  }`}
+                className={`p-4 cursor-pointer transition-colors ${
+                  selectedIcons.some(i => i.id === icon.id) ? "bg-primary text-primary-foreground" : ""
+                }`}
                 onClick={() => toggleIcon(icon)}
               >
                 <img
