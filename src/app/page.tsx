@@ -104,7 +104,7 @@ export default function IconBuilder() {
         <div className="w-full lg:w-1/3 lg:sticky lg:top-10 lg:self-start">
           <div className="mb-6 text-center" id="title">
             <Image
-              src={`./Skill-Icons-Builder-Logo-${isDarkTheme ? 'light' : 'dark'}.svg`}
+              src={`/Skill-Icons-Builder-Logo-${isDarkTheme ? 'light' : 'dark'}.svg`}
               alt="Skill Icons Builder Logo"
               width={500}
               height={300}
@@ -140,9 +140,11 @@ export default function IconBuilder() {
                 {selectedIcons.length > 0 ? (
                   selectedIcons.map((icon) => (
                     <div key={icon.id} className="cursor-move h-fit w-fit">
-                      <img
+                      <Image
                         src={`https://skillicons.dev/icons?i=${icon.id}&theme=${iconTheme ? 'dark' : 'light'}`}
                         alt={icon.name}
+                        width={48}
+                        height={48}
                       />
                     </div>
                   ))
@@ -260,9 +262,11 @@ export default function IconBuilder() {
                 }`}
                 onClick={() => toggleIcon(icon)}
               >
-                <img
+                <Image
                   src={`https://skillicons.dev/icons?i=${icon.id}&theme=${selectedTheme}`}
                   alt={icon.name}
+                  width={48}
+                  height={48}
                   className="w-12 h-12 mx-auto mb-2"
                 />
                 <p className="text-center text-sm">{icon.name}</p>
