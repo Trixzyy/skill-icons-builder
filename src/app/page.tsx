@@ -14,6 +14,7 @@ import { ReactSortable } from "react-sortablejs";
 import { availableIcons, IconItem } from "../lib/icons"
 import Image from "next/image";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import StarRepository from "@/components/star-repo";
 
 export default function IconBuilder() {
   const { theme, resolvedTheme } = useTheme();
@@ -236,6 +237,7 @@ export default function IconBuilder() {
                 </Button>
               </div>
             </TabsContent>
+            <StarRepository />
           </Tabs>
         </div>
         <div className="w-full lg:w-2/3">
